@@ -55,6 +55,10 @@ const createGraph = (width = 500) => {
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
 
   const update = (angle = 0, midpoints = [], sin = [], cos = []) => {
+    if (canvas.isDestroyed) {
+      return;
+    }
+    
     if (state.isPaused) {
       return window.requestAnimationFrame(() => update(angle, midpoints, sin, cos));
     }
@@ -154,6 +158,16 @@ const createGraph = (width = 500) => {
 };
 
 
+const render = () => {
+  const root = document.getElementById('root');
+  Object.assign(root.querySelector('canvas') || {}, { isDestroyed: true });
+  root.innerHTML = '';
+  root.appendChild(
+    createGraph(Math.min(window.innerWidth, window.innerHeight) * .9),
+  );
+};
+
+
 const shortcuts = {
   h: {
     description: 'Show/hide help (keyboard shortcuts)',
@@ -220,10 +234,10 @@ const shortcuts = {
   },
   0: {
     description: 'Reset animation',
-    fn: () => Object.assign(state, initialState),
+    fn: () => Object.assign(state, initialState, { showHelp: state.showHelp }),
   },
   9: {
-    description: 'Show All',
+    description: 'Show All (except legend)',
     fn: () => Object.assign(state, {
       showAxes: true,
       showOuterCircle: true,
@@ -234,7 +248,7 @@ const shortcuts = {
       showMidpointTrace: true,
       showSinWave: true,
       showCosWave: true,
-      showLegend: true,
+      showLegend: false,
     }),
   },
 };
@@ -249,9 +263,13 @@ window.addEventListener('keypress', (e) => {
 });
 
 
-document.getElementById('root').appendChild(createGraph(800));
+window.addEventListener('resize', render);
 
 
+render();
+
+
+// Auto-show help on startup...
 setTimeout(() => {
   window.dispatchEvent(new window.KeyboardEvent('keypress', { key: 'h' }));
 });
