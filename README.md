@@ -5,7 +5,7 @@ bella", que explora una visualización de relaciones trigonométricas. En
 particular, nos centramos en las funciones _circulares_ _seno_ (`sin`) y
 _coseno_ (`cos`).
 
-[Acá puedes ver la visualización](#).
+[Acá puedes ver la visualización](https://lupomontero.github.io/trig/).
 
 Si te animas a leer el código fuente de una, adelante! Si no acá tienes una
 intro a las decisiones de diseño e implementación.
