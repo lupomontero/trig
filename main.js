@@ -23,7 +23,7 @@ const drawLine = (ctx, fromX, fromY, toX, toY) => {
 
 
 const initialState = {
-  isPaused: false,
+  showHelp: false,
   showAxes: false,
   showOuterCircle: false,
   showMidpoint: false,
@@ -34,6 +34,7 @@ const initialState = {
   showSinWave: false,
   showCosWave: false,
   showLegend: false,
+  isPaused: false,
 };
 
 
@@ -41,8 +42,10 @@ const state = { ...initialState };
 
 
 const createGraph = (width = 500) => {
-  const canvas = document.createElement('canvas');
-  Object.assign(canvas, { width, height: width });
+  const canvas = Object.assign(
+    document.createElement('canvas'),
+    { width, height: width },
+  );
   const ctx = canvas.getContext('2d');
   const radius = width / 2;
   const center = { x: radius, y: radius }; // Circumference center x, y
@@ -151,78 +154,104 @@ const createGraph = (width = 500) => {
 };
 
 
+const shortcuts = {
+  h: {
+    description: 'Show/hide help (keyboard shortcuts)',
+    fn: () => {
+      Object.assign(state, { showHelp: !state.showHelp });
+      if (!state.showHelp) {
+        return document.body.removeChild(document.querySelector('.help'));
+      }
+      const container = Object.assign(document.createElement('div'), {
+        className: 'help',
+        innerHTML: '<h2>Keyboard shortcuts</h2>',
+      });
+      Object.keys(shortcuts).forEach((key) => {
+        const el = document.createElement('div');
+        el.textContent = `${key}: ${shortcuts[key].description}`;
+        container.appendChild(el);
+      });
+      document.body.appendChild(container);
+    },
+  },
+  a: {
+    description: 'Show/hide X and Y axes',
+    fn: () => Object.assign(state, { showAxes: !state.showAxes }),
+  },
+  o: {
+    description: 'Show/hide outer circle',
+    fn: () => Object.assign(state, { showOuterCircle: !state.showOuterCircle }),
+  },
+  m: {
+    description: 'Show/hide mid point between X and Y projections',
+    fn: () => Object.assign(state, { showMidpoint: !state.showMidpoint }),
+  },
+  n: {
+    description: 'Show/hide mid point trace between X and Y projections (mid point - shortcut m - should be visible)',
+    fn: () => Object.assign(state, { showMidpointTrace: !state.showMidpointTrace }),
+  },
+  r: {
+    description: 'Show/hide radius',
+    fn: () => Object.assign(state, { showRadius: !state.showRadius }),
+  },
+  x: {
+    description: 'Show/hide line from point on circle to X projection',
+    fn: () => Object.assign(state, { showXProjection: !state.showXProjection }),
+  },
+  y: {
+    description: 'Show/hide line from point on circle to Y projection',
+    fn: () => Object.assign(state, { showYProjection: !state.showYProjection }),
+  },
+  s: {
+    description: 'Show/hide sine wave plot',
+    fn: () => Object.assign(state, { showSinWave: !state.showSinWave }),
+  },
+  c: {
+    description: 'Show/hide cosine wave plot',
+    fn: () => Object.assign(state, { showCosWave: !state.showCosWave }),
+  },
+  l: {
+    description: 'Show/hide legend',
+    fn: () => Object.assign(state, { showLegend: !state.showLegend }),
+  },
+  p: {
+    description: 'Pause/play animation',
+    fn: () => Object.assign(state, { isPaused: !state.isPaused }),
+  },
+  0: {
+    description: 'Reset animation',
+    fn: () => Object.assign(state, initialState),
+  },
+  9: {
+    description: 'Show All',
+    fn: () => Object.assign(state, {
+      showAxes: true,
+      showOuterCircle: true,
+      showRadius: true,
+      showXProjection: true,
+      showYProjection: true,
+      showMidpoint: true,
+      showMidpointTrace: true,
+      showSinWave: true,
+      showCosWave: true,
+      showLegend: true,
+    }),
+  },
+};
+
+
 window.addEventListener('keypress', (e) => {
-  switch (e.key) {
-    case '1':
-      Object.assign(state, initialState, { showAxes: true });
-      break;
-    case '2':
-      Object.assign(state, initialState, { showAxes: true, showOuterCircle: true });
-      break;
-    case '3':
-      Object.assign(state, initialState, { showAxes: true, showOuterCircle: true, showRadius: true, showXProjection: true });
-      break;
-    case '4':
-      Object.assign(state, initialState, { showAxes: true, showOuterCircle: true, showRadius: true, showXProjection: true, showYProjection: true });
-      break;
-    case '5':
-      Object.assign(state, initialState, { showAxes: true, showOuterCircle: true, showMidpoint: true });
-      break;
-    case '6':
-      Object.assign(state, initialState, { showAxes: true, showOuterCircle: true, showMidpoint: true, showMidpointTrace: true });
-      break;
-    case '7':
-      Object.assign(state, initialState, { showAxes: true, showOuterCircle: true, showSinWave: true });
-      break;
-    case '8':
-      Object.assign(state, initialState, { showAxes: true, showOuterCircle: true, showCosWave: true });
-      break;
-    case '9':
-      Object.assign(state, initialState, { showAxes: true, showOuterCircle: true, showRadius: true, showXProjection: true, showYProjection: true, showMidpoint: true, showMidpointTrace: true, showSinWave: true, showCosWave: true });
-      break;
-    case 'a':
-      state.showAxes = !state.showAxes;
-      break;
-    case 'o':
-      state.showOuterCircle = !state.showOuterCircle;
-      break;
-    case 'm':
-      state.showMidpoint = !state.showMidpoint;
-      break;
-    case 'n':
-      state.showMidpointTrace = !state.showMidpointTrace;
-      break;
-    case 'r':
-      state.showRadius = !state.showRadius;
-      break;
-    case 'x':
-      state.showXProjection = !state.showXProjection;
-      break;
-    case 'y':
-      state.showYProjection = !state.showYProjection;
-      break;
-    case 's':
-      state.showSinWave = !state.showSinWave;
-      break;
-    case 'c':
-      state.showCosWave = !state.showCosWave;
-      break;
-    case 'l':
-      state.showLegend = !state.showLegend;
-      break;
-    case 'p':
-      state.isPaused = !state.isPaused;
-      break;
-    case ' ':
-    case '0':
-      Object.assign(state, initialState);
-      break;
+  if (!shortcuts[e.key]) {
+    return;
   }
+
+  shortcuts[e.key].fn();
 });
 
 
 document.getElementById('root').appendChild(createGraph(800));
 
+
 setTimeout(() => {
-  window.dispatchEvent(new window.KeyboardEvent('keypress', { key: '9' }));
+  window.dispatchEvent(new window.KeyboardEvent('keypress', { key: 'h' }));
 });
